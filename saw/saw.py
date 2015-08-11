@@ -207,12 +207,12 @@ class DB(object):
         self.metadata.create_all(self.engine)
         self.create_mapped_tables()
 
-    def insert(self, obj, returning_id=None):
+    def insert(self, obj, commit=True, returning_id=None):
         """Insert a new object."""
         session = self.get_session()
         try:
             session.add(obj)
-            session.commit()
+            if commit: session.commit()
             if returning_id:
                 returning_id = getattr(obj, returning_id)
         except Exception as exc:
@@ -224,12 +224,12 @@ class DB(object):
 
         return returning_id
 
-    def delete(self, obj):
+    def delete(self, obj, commit=True):
         """Removes an object."""
         session = self.get_session()
         try:
             session.delete(obj)
-            session.commit()
+            if commit: session.commit()
         except Exception as exc:
             session.rollback()
             raise exc
@@ -237,12 +237,12 @@ class DB(object):
             session.close()
             self.clean_session
 
-    def update(self, obj):
+    def update(self, obj, commit=True):
         """Updates an object"""
         session = self.get_session()
         try:
             session.merge(obj)
-            session.commit()
+            if commit: session.commit()
         except Exception as exc:
             session.rollback()
             raise exc
